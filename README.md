@@ -19,13 +19,15 @@ Riot offers its clients a variety of subscription plans based on the number of w
 ## The proposed solution:
 To gather and compute the MRR for a given month, we must first collect the list of subscriptions that are active for that month. However, because the Subscriptions API repeats the same answer for the months of January 22, February 22, and March 22, we can make three requests to gather all the information we require. This information can then be kept in an in-memory cache, such as reddis or memcache, but for the purposes of this problem and because the amount of data isn't too large, we'll just use a simple (key, value) `Map` in Typescript. We can calculate the MRR using this data, but first we must filter the response to only retain the active subscriptions. The next step is to sum the result of the product of `unit_amount` and `quantity` as we iterate through the subscription's elements. Divide this amount by the relevant factor. For monthly subscriptions, the factor will be 1, and for `yealy` subscriptions, it will be 12. We need to also take off the percentage described by the `off_pourcentage`. Depending on the currency of the billing of each subscription we need to tranform the We can store this information as it will be useful for use to compute the evolution of the MRR of a given month compared to the previous one. The diagram below have a high level the design of the solution :
 
+![design](./docs/tryriot.drawio.png)
+
 ## Implementation:
 The API is RESTful API with two endpoints :
 ### MRR API :
 - Path : `/mrr`
 - Query Params :
-	- month -> string / the month for which we want to get the MRR 
-	- currency -> [USD, EUR] / the currency of the result
+	- `month` -> `string` / the month for which we want to get the MRR 
+	- `currency` -> `[USD, EUR]` / the currency of the result
 - Return : 
 ```
 {
@@ -35,14 +37,20 @@ The API is RESTful API with two endpoints :
 ```
 
 ### Difference MRR API :
-- Path : `/difference`
+- Path : `/diff`
 - Query Params :
-	- `month` -> string / the month for which we want to get the MRR for.
-	- `subscriptionId` -> string / The specific subscriptionId we want to get the subscription for
-	- `currency` -> [USD, EUR] / the currency of the resulted MRR
+	- `month` -> `string` / the month for which we want to get the MRR for.
+	- `subscriptionId` -> `string` / The specific subscriptionId we want to get the subscription for
+	- `currency` -> `[USD, EUR]` / the currency of the resulted MRR
 - Return : 
 ```
 {
 	"total": number, 
 	"currency": string
 }
+
+## Technical Stack:
+- Node & PNPM
+- Typescript
+- Hono for server (honojs.dev)
+- Vitest / Supertest for testing

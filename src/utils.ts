@@ -1,7 +1,7 @@
 import { Currency, Month } from './types'
 
-const USD_TO_EUR_XRATE = 1.07
-const EUR_TO_USD_XRATE = 0.93
+const USD_TO_EUR_XRATE = 0.93
+const EUR_TO_USD_XRATE = 1.08
 
 /**
  * Gets the previous month of a given month
@@ -31,4 +31,14 @@ export function exchangeCurrency(
 	if (from === to) return amount
 	if (from === 'usd') return amount * USD_TO_EUR_XRATE
 	else return amount * EUR_TO_USD_XRATE
+}
+
+/**
+ * Query Params that contains space are passed with + instead of the white space
+ * This helper function helps as get the correct from
+ * @param qParam The + seperated query param
+ * @returns the query param with space instead of +
+ */
+export function monthQueryParamParser(qParam: string) {
+	return qParam.replace('+', ' ')
 }

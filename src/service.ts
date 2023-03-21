@@ -4,13 +4,14 @@ import { Currency, Month, Subscription, SubscriptionResponse } from './types'
 
 // We'll use this cache instead of call the API everytime
 // key is the month and value is the SubscriptionResponse received from the API
-const cache = new Map<string, SubscriptionResponse>()
+export const cache = new Map<string, SubscriptionResponse>()
 
 export async function getSubscriptions(): Promise<SubscriptionResponse[]> {
 	if (cache.size) {
 		return Array.from(cache.values())
 	} else {
 		const subscriptions = await fetchSubscriptions()
+		
 		if (subscriptions) {
 			subscriptions.forEach((sub) => cache.set(sub.date, sub))
 			return subscriptions
@@ -27,7 +28,10 @@ export async function getSubscriptionsByMonth(month: Month) {
 		return cache.get(month)
 	}
 	const subscriptions = await getSubscriptions()
+	console.log({subscriptions});
+	
 	const subscriptionsForMonth = subscriptions.find((sub) => sub.date === month)
+	
 	if (subscriptionsForMonth) return subscriptionsForMonth
 	else throw Error(`No subscriptions found for month : ${month}`)
 }
@@ -95,11 +99,22 @@ export function computeSubscriptionSumWithDiscount(
 	return 0
 }
 
+
+/**
+ * Computes the difference in the MRR of specifici subscription given subscriptionId
+ * between the curren month and previous month
+ * @param month The current month
+ * @param subscriptionId The subscription id for which we want to get the MRR
+ * @param currency the currency of the desired result
+ * @returns a string reperesentation of the result in the desired currency
+ */
 export async function getSubscriptionDiffByMonth(
 	month: Month,
 	subscriptionId: string,
-) {
+	currency: Currency
+): Promise<string | undefined> {
 	const prevMonth = monthBefore(month)
+
 	if (prevMonth) {
 		const currentMonthSubs = await getSubscriptionsByMonth(month)
 		const prevMonthSubs = await getSubscriptionsByMonth(prevMonth)
@@ -110,9 +125,12 @@ export async function getSubscriptionDiffByMonth(
 			(sub) => sub.id === subscriptionId,
 		)
 		if (prevSub && currSub) {
-			const diff =
-				computeSubscriptionSumWithDiscount(currSub) -
-				computeSubscriptionSumWithDiscount(prevSub)
+			// We assuume hee the the subscription does not change the currency
+			const sumCurrSub = exchangeCurrency(computeSubscriptionSumWithDiscount(currSub), currSub.currency, currency)
+			const sumPrevSub = exchangeCurrency(computeSubscriptionSumWithDiscount(prevSub), currSub.currency, currency)
+			const diff = sumCurrSub - sumPrevSub
+			if (diff) return (diff / 100).toFixed(2)
+			return ''
 		} else {
 			throw new Error(`The data for the ${subscriptionId} was not found`)
 		}

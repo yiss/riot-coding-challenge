@@ -8,7 +8,7 @@ import {
 	afterEach,
 } from 'vitest'
 import { fetchSubscription, fetchSubscriptions } from '../src/client'
-import { mockedHttpResponse } from './mock'
+import { mockedHttpResponseForJan22 } from './data.mock'
 
 import fetch, { Response } from 'node-fetch'
 vi.mock('node-fetch')
@@ -28,7 +28,7 @@ describe('client.test', () => {
 	it('should retrun mocked response', async () => {
 		mockFetch.mockResolvedValue({
 			ok: true,
-			json: () => Promise.resolve(mockedHttpResponse)
+			json: () => Promise.resolve(mockedHttpResponseForJan22)
 		} as Response)
 		const response = await fetchSubscription()
 		expect(response).toBeDefined()
@@ -43,7 +43,7 @@ describe('client.test', () => {
 	it('should call fetch 3 times', async () => {
 		mockFetch.mockResolvedValue({
 			ok: true,
-			json: () => Promise.resolve(mockedHttpResponse)
+			json: () => Promise.resolve(mockedHttpResponseForJan22)
 		} as Response)
 		const response = await fetchSubscriptions()
 		expect(mockFetch).toBeCalledTimes(3)
