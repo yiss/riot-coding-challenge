@@ -11,7 +11,7 @@ export async function getSubscriptions(): Promise<SubscriptionResponse[]> {
 		return Array.from(cache.values())
 	} else {
 		const subscriptions = await fetchSubscriptions()
-		
+
 		if (subscriptions) {
 			subscriptions.forEach((sub) => cache.set(sub.date, sub))
 			return subscriptions
@@ -28,10 +28,10 @@ export async function getSubscriptionsByMonth(month: Month) {
 		return cache.get(month)
 	}
 	const subscriptions = await getSubscriptions()
-	console.log({subscriptions});
-	
+	console.log({ subscriptions })
+
 	const subscriptionsForMonth = subscriptions.find((sub) => sub.date === month)
-	
+
 	if (subscriptionsForMonth) return subscriptionsForMonth
 	else throw Error(`No subscriptions found for month : ${month}`)
 }
@@ -99,7 +99,6 @@ export function computeSubscriptionSumWithDiscount(
 	return 0
 }
 
-
 /**
  * Computes the difference in the MRR of specifici subscription given subscriptionId
  * between the curren month and previous month
@@ -111,7 +110,7 @@ export function computeSubscriptionSumWithDiscount(
 export async function getSubscriptionDiffByMonth(
 	month: Month,
 	subscriptionId: string,
-	currency: Currency
+	currency: Currency,
 ): Promise<string | undefined> {
 	const prevMonth = monthBefore(month)
 
@@ -126,8 +125,16 @@ export async function getSubscriptionDiffByMonth(
 		)
 		if (prevSub && currSub) {
 			// We assuume hee the the subscription does not change the currency
-			const sumCurrSub = exchangeCurrency(computeSubscriptionSumWithDiscount(currSub), currSub.currency, currency)
-			const sumPrevSub = exchangeCurrency(computeSubscriptionSumWithDiscount(prevSub), currSub.currency, currency)
+			const sumCurrSub = exchangeCurrency(
+				computeSubscriptionSumWithDiscount(currSub),
+				currSub.currency,
+				currency,
+			)
+			const sumPrevSub = exchangeCurrency(
+				computeSubscriptionSumWithDiscount(prevSub),
+				currSub.currency,
+				currency,
+			)
 			const diff = sumCurrSub - sumPrevSub
 			if (diff) return (diff / 100).toFixed(2)
 			return ''

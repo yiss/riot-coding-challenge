@@ -13,7 +13,6 @@ import { mockedHttpResponseForJan22 } from './data.mock'
 import fetch, { Response } from 'node-fetch'
 vi.mock('node-fetch')
 
-
 describe('client.test', () => {
 	let mockFetch: MockedFunction<typeof fetch>
 
@@ -28,7 +27,7 @@ describe('client.test', () => {
 	it('should retrun mocked response', async () => {
 		mockFetch.mockResolvedValue({
 			ok: true,
-			json: () => Promise.resolve(mockedHttpResponseForJan22)
+			json: () => Promise.resolve(mockedHttpResponseForJan22),
 		} as Response)
 		const response = await fetchSubscription()
 		expect(response).toBeDefined()
@@ -37,13 +36,15 @@ describe('client.test', () => {
 
 	it('should retrun http error response', async () => {
 		mockFetch.mockRejectedValue('Generic Error')
-		await expect( () => fetchSubscription()).rejects.toThrowError('Generic Error')
+		await expect(() => fetchSubscription()).rejects.toThrowError(
+			'Generic Error',
+		)
 	})
 
 	it('should call fetch 3 times', async () => {
 		mockFetch.mockResolvedValue({
 			ok: true,
-			json: () => Promise.resolve(mockedHttpResponseForJan22)
+			json: () => Promise.resolve(mockedHttpResponseForJan22),
 		} as Response)
 		const response = await fetchSubscriptions()
 		expect(mockFetch).toBeCalledTimes(3)

@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "dev": "NODE_ENV=developement tsx watch src/index.ts",
-    "test": "vitest"
+    "test": "vitest",
+    "format": "rome format . --write",
+    "lint:check": "rome check"
   },
   "keywords": [],
   "author": "",

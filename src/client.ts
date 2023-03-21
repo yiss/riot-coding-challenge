@@ -17,9 +17,8 @@ export class HTTPError extends Error {
 export async function fetchSubscription(): Promise<
 	SubscriptionResponse | undefined
 > {
-	
 	const response = await fetch(SUBSCRIPTIONS_URL)
-	
+
 	if (response.ok) {
 		return (await response.json()) as SubscriptionResponse
 	}
@@ -31,8 +30,8 @@ export async function fetchSubscription(): Promise<
  * we can call the API 3 times and get all the subscriptions for those months at the same time
  */
 export async function fetchSubscriptions(): Promise<SubscriptionResponse[]> {
-	console.log('calling you');
-	
+	console.log('calling you')
+
 	let subscriptions: SubscriptionResponse[] = []
 	try {
 		// We make 3 request in sequence to the API

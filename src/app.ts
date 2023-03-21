@@ -21,9 +21,12 @@ app.get('/mrr', async (c) => {
 app.get('/diff', async (c) => {
 	let { month, currency, subscriptionId } = c.req.query()
 	month = monthQueryParamParser(month)
-	const result = await getSubscriptionDiffByMonth(month as Month, subscriptionId, currency as Currency)
+	const result = await getSubscriptionDiffByMonth(
+		month as Month,
+		subscriptionId,
+		currency as Currency,
+	)
 	return c.json({ result, currency })
 })
-
 
 export default app
